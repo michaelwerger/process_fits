@@ -1,6 +1,10 @@
-function [ lin_rgb ] = readdng( filename )
-%READDNG Summary of this function goes here
-%   Detailed explanation goes here
+
+clear,clc,close all
+
+% Define transformation matrix from sRGB space to XYZ space for later use
+
+% http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+
 % AdobeRGB
 srgb2xyz = [0.4124564 0.3575761 0.1804375;
     0.2126729 0.7151522 0.0721750;
@@ -11,22 +15,21 @@ srgb2xyz = [0.4497288  0.3162486  0.1844926;
  0.2446525  0.6720283  0.0833192;
  0.0251848  0.1411824  0.9224628];
 
-%filename = '/Users/Micha/data/20160719_pacman/dng/IMG_2614.dng'; % Put file name here 
+filename = '/Users/Micha/data/20160719_pacman/dng/IMG_2614.dng'; % Put file name here 
 %filename = 'banana_slug.dng'
-%warning off MATLAB:tifflib:TIFFReadDirectory:libraryWarning
-warning off MATLAB:tifflib:TIFFReadDirectory
+warning off MATLAB:tifflib:TIFFReadDirectory:libraryWarning
 t = Tiff(filename,'r');
 
-%Tiff.getTagNames
-offsets = getTag(t,'SubIFD');
+Tiff.getTagNames
+offsets = getTag(t,'SubIFD')
 %offsets(1)
 
 setSubDirectory(t,offsets(1));
 raw = read(t);
 close(t);
-meta_info = imfinfo(filename);
-%meta_info.SubIFDs{1}
-%meta_info.SubIFDs{2}
+meta_info = imfinfo(filename)
+meta_info.SubIFDs{1}
+meta_info.SubIFDs{2}
 
 % Crop to only valid pixels
 x_origin = meta_info.SubIFDs{1}.DefaultCropOrigin(2)+1;
@@ -56,6 +59,14 @@ balanced_bayer = lin_bayer .* mask;
 temp = uint16(balanced_bayer/max(balanced_bayer(:))*pow2(16));
 lin_rgb = uint16(demosaic(temp,'rggb'));
 
+shrink = 1.0;
+lin_rgb_resized = imresize(lin_rgb,shrink);
+lin_r_resized = imresize(lin_rgb(:,:,1),shrink);
+lin_g_resized = imresize(lin_rgb(:,:,2),shrink);
+lin_b_resized = imresize(lin_rgb(:,:,3),shrink);
 
-end
+imwrite(lin_rgb_resized,'m42.tiff')
+image(log10(double(cuts(lin_r_resized,450,60000))),'CDataMapping','scaled')
+colormap 'Pink'
+colorbar
 
