@@ -1,5 +1,5 @@
-function [ ] = writeTiff( data, filename )
-    rgb = demosaic(uint16(data),'rggb');
+function [ ] = writeTiff( data, filename , value)
+    rgb = demosaic(uint16(data*value),'rggb');
     t_out = Tiff(filename,'w')
     tagstruct.ImageLength = size(rgb,1)
     tagstruct.ImageWidth = size(rgb,2)
