@@ -59,6 +59,14 @@ function [ outrgb ] = rgbshiftdxdy( refrgb, movrgb, varargin )
     movg   = movrgb(ystart:yend,xstart:xend,2);
     refg   = refrgb(ystart:yend,xstart:xend,2);
     
+%     scrsz = get(groot,'ScreenSize');
+%     fighc = figure('Position',[1 200 800 400]);
+%     figure(fighc)
+%     subplot(1,2,1)
+%     imagesc(cuts(refg,0,100000))
+%     subplot(1,2,2)
+%     imagesc(cuts(movg,0,100000))
+    
     [dx, dy] = getOffset(movg,refg);
 
     outrgb(:,:,1) = layershiftdxdy(movrgb(:,:,1), dx, dy);

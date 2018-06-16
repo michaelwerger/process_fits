@@ -1,28 +1,23 @@
-% fixed_lin_rgb = imread('/Users/Micha/data/20160719/jpg/IMG_2564.jpg');
-% moving_lin_rgb = imread('/Users/Micha/data/20160719/jpg/IMG_2566.jpg');
-% fixed = fixed_lin_rgb(:,:,1);
-% moving = moving_lin_rgb(:,:,1);
-% transformType = 'Translation';
-% [optimizer, metric] = imregconfig ('monomodal')
-% moving_reg = imregister(moving, fixed, transformType, optimizer, metric) ;
-% result = fixed + moving_reg;
-% moving_lin_rgb = imread('/Users/Micha/data/20160719/jpg/IMG_2568.jpg');
-% moving = moving_lin_rgb(:,:,1);
-% moving_reg = imregister(moving, fixed, transformType, optimizer, metric) ;
-% result = result + moving_reg;
-% 
-% moving_lin_rgb = imread('/Users/Micha/data/20160719/jpg/IMG_2570.jpg');
-% moving = moving_lin_rgb(:,:,1);
-% moving_reg = imregister(moving, fixed, transformType, optimizer, metric) ;
-% 
-% % moving_lin_rgb = imread('/Users/Micha/data/20160719/jpg/IMG_2572.jpg');
-% % moving = moving_lin_rgb(:,:,1);
-% moving_reg = imregister(moving, fixed, transformType, optimizer, metric) ;
-% result = result + moving_reg;
+% # ISO t
+ 
+warning('off','all');
 
-m13_ISO800_30_2838 = double(readrawfromdng('/Users/Micha/data/20160810/dng/img_2838.dng')) - dark_ISO800_30 ;
-m13_ISO800_30_2838_corr = m13_ISO800_30_2838 ./ flat_ISO800_1 ;
-
-writeTiff(m13_ISO800_30_2838_corr,'/Users/Micha/data/20160810/tif/img_2838.tif',1.0);
-
-
+clear raw
+filenumbers = getfilenumbers(dngpath);
+sz = size(filenumbers);
+ 
+for i = [1:sz(1)]
+    ifile = char(strcat(dngpath, 'IMG_',filenumbers(i), '.dng')) ;
+    if i < 2
+        result(1).bayer = single(readrawfromdng(ifile));
+        result(1).rgb   = single(demosaic(uint16(result(1).bayer),'rggb'));
+        result(1).rgb   = reducergb(result(1).rgb,darkrgb,normflatrgb);
+        masterrgb       = result(1).rgb;
+ 
+    else
+        result(2).bayer = single(readrawfromdng(ifile));
+        result(2).rgb   = single(demosaic(uint16(result(2).bayer),'rggb'));
+        result(2).rgb   = reducergb(result(2).rgb,darkrgb,normflatrgb);
+        result(1).rgb   = result(1).rgb + rgbshiftdxdy( masterrgb, result(2).rgb);
+    end
+end

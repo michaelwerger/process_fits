@@ -1,11 +1,16 @@
-function [ result_array ] = cuts( input_array, lower, upper )
+function [ result_array ] = normalize( input_array )
+
+    % stretch array into bounds lower ...upper and normalize to 0 ... 1
+    
+    lower = min(min(input_array));
+    upper = max(max(input_array));
     if size(size(input_array)) == [1 2]
         disp([1 2])
     %CUTS clip array inbetween lower and upper value
         result_array = input_array;
         result_array(result_array >= upper) = upper;
         result_array(result_array <= lower) = lower;
-        %result_array = (result_array - lower)/(upper - lower)*100;
+        result_array = (result_array - lower)/(upper - lower);
         
     elseif size(size(input_array)) == [1 3]
     %CUTS clip array inbetween lower and upper valuefi
@@ -15,7 +20,7 @@ function [ result_array ] = cuts( input_array, lower, upper )
             layer = input_array(:,:,i);
             layer(layer >= upper) = upper;
             layer(layer <= lower) = lower;
-            result_array(:,:,i) = layer; %(layer - lower)/(upper - lower)*100;
+            result_array(:,:,i) = (layer - lower)/(upper - lower);
         end
     else
         disp(0)

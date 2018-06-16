@@ -7,6 +7,8 @@ function [ xoffset, yoffset ] = getOffset( moving, fixed )
     %dy = int16(tform.T(3,2)); % or dx
     
     c = normxcorr2(fixed, moving);
+    %figure()
+    %imagesc(c)
     [ypeak, xpeak] = find(c == max(c(:)));
     [ysize,xsize] = size(moving);
     yoffset = ypeak - ysize;
